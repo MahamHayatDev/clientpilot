@@ -1,0 +1,68 @@
+{
+  "name": "ClientPilot Error Alert",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f9e195b8-8476-4bcf-8988-776bb0b679d6",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mahamhayat192@gmail.com",
+        "toEmail": "mahamhayat192@gmail.com",
+        "subject": "=ClientPilot problem: {{ $json.workflow.name }}",
+        "emailFormat": "text",
+        "text": "=Workflow \"{{ $json.workflow.name }}\" failed. Error: {{ $json.execution.error.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "443aacda-11c7-4c71-b93b-1a81ed882a64",
+      "name": "Send an Email",
+      "webhookId": "ebdc9f56-71f0-4ae4-8586-191bffdfef90",
+      "credentials": {
+        "smtp": {
+          "id": "E496et3ssMEVzxyQ",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e918bbbc-0614-4119-9dd6-edeb53e2f58a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f84c121824e406fe65f218b77e64e2023b6cfe7a45b7eea962148713d41093b"
+  },
+  "nodeGroups": [],
+  "id": "Zu5Yd0PZ0eTsSwcf",
+  "tags": []
+}

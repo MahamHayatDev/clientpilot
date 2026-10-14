@@ -1,0 +1,386 @@
+CLIENTPILOT REVIEW FILES
+
+======================================================================
+FILE: app\agents\scoring.py
+======================================================================
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+from app.config import GOOGLE_API_KEY, MODEL_NAME
+from app.my_services import IDEAL_CLIENT, MY_SERVICES
+from app.schemas import ScoreResult
+
+SYSTEM_PROMPT = """You are a strict lead-qualification analyst working for a freelancer.
+You decide how well a company fits the freelancer's services.
+
+FREELANCER SERVICES:
+{services}
+
+IDEAL CLIENT:
+{ideal_client}
+
+SCORING RUBRIC (total 100 points):
+- Industry fit, 0-35: how closely the company's industry matches the ideal client.
+- Visible need, 0-35: how clearly the research shows a gap the services could fix.
+- Reachability, 0-20: small or mid-size companies score high; very large enterprises
+  that rarely hire freelancers score low.
+- Evidence quality, 0-10: how specific and reliable the research is.
+
+RULES:
+- Base the score ONLY on the research provided. Never invent facts.
+- Add the four parts to get the total. Be strict: most companies should land between 30 and 70.
+- Scores above 80 are rare and need strong evidence in every category.
+- Keep the reasoning to 2-3 sentences and mention specific details from the research."""
+
+HUMAN_PROMPT = """Company: {name}
+
+Research:
+- What they do: {what_they_do}
+- Audience: {audience}
+- Gaps: {gaps}
+- Research confidence: {confidence}"""
+
+prompt = ChatPromptTemplate.from_messages(
+    [("system", SYSTEM_PROMPT), ("human", HUMAN_PROMPT)]
+)
+
+llm = ChatGoogleGenerativeAI(
+    model=MODEL_NAME,
+    google_api_key=GOOGLE_API_KEY,
+    max_retries=2,
+)
+
+chain = prompt | llm.with_structured_output(ScoreResult)
+
+
+def run_scoring(name: str, research: dict) -> ScoreResult:
+    gaps = research.get("gaps") or []
+
+    return chain.invoke(
+        {
+            "services": MY_SERVICES,
+            "ideal_client": IDEAL_CLIENT,
+            "name": name,
+            "what_they_do": research.get("what_they_do", "not stated"),
+            "audience": research.get("audience", "not stated"),
+            "gaps": "; ".join(gaps) if gaps else "none found",
+            "confidence": research.get("confidence", "low"),
+        }
+    )
+
+======================================================================
+FILE: app\agents\drafting.py
+======================================================================
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+from app.config import GOOGLE_API_KEY, MODEL_NAME
+from app.my_services import MY_LINK, MY_NAME, MY_PROOF, MY_SERVICES
+from app.schemas import DraftResult
+
+
+MIN_WORDS = 60
+MAX_WORDS = 110
+MAX_ATTEMPTS = 3
+
+BANNED_PHRASES = [
+    "i hope this email finds you well",
+    "i hope this finds you well",
+    "touch base",
+    "just checking in",
+    "game-changing",
+    "game changer",
+    "revolutionary",
+    "cutting-edge",
+    "synergy",
+    "world-class",
+    "best-in-class",
+]
+
+
+SYSTEM_PROMPT = """You write short, honest cold outreach emails for a freelancer.
+
+ABOUT THE SENDER (the ONLY claims you may make about them):
+{proof}
+
+SERVICES OFFERED:
+{services}
+
+STRICT RULES:
+- Write the email BODY only. No greeting, no signature, no subject inside the body.
+- Write 60 to 110 words. Plain text. No bullet points, no emojis, no brackets or placeholders.
+- Mention exactly ONE specific gap from the research, in a neutral and respectful way.
+- Never say the company's product or work is bad.
+- Offer ONE concrete, small idea related to that gap. Do not promise results.
+- Never invent facts about the company, the sender, past clients, or numbers.
+- No flattery, hype words, or buzzwords. Sound like a thoughtful person, not a template.
+- End with one low-pressure question, such as asking if they would like a short example.
+{feedback}"""
+
+
+HUMAN_PROMPT = """Company: {name}
+
+Research:
+- What they do: {what_they_do}
+- Audience: {audience}
+- Gaps: {gaps}
+
+Why this company scored well: {score_reasoning}"""
+
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", SYSTEM_PROMPT),
+        ("human", HUMAN_PROMPT),
+    ]
+)
+
+
+llm = ChatGoogleGenerativeAI(
+    model=MODEL_NAME,
+    google_api_key=GOOGLE_API_KEY,
+    max_retries=2,
+)
+
+chain = prompt | llm.with_structured_output(DraftResult)
+
+
+def find_problems(draft: DraftResult) -> list[str]:
+    problems = []
+    body = draft.body.strip()
+    words = len(body.split())
+
+    if words < MIN_WORDS or words > MAX_WORDS:
+        problems.append(
+            f"The body has {words} words. It must be between "
+            f"{MIN_WORDS} and {MAX_WORDS} words."
+        )
+
+    if any(ch in body for ch in "[]{}"):
+        problems.append("Remove all brackets and placeholders.")
+
+    lowered = body.lower()
+
+    for phrase in BANNED_PHRASES:
+        if phrase in lowered:
+            problems.append(f'Remove the phrase "{phrase}".')
+
+    if len(draft.subject.split()) > 8:
+        problems.append("The subject must be 8 words or fewer.")
+
+    if not draft.subject.strip():
+        problems.append("The subject is empty.")
+
+    if not draft.gap_referenced.strip():
+        problems.append("The referenced research gap cannot be empty.")
+
+    return problems
+
+
+def run_drafting(
+    name: str, research: dict, score_reasoning: str
+) -> tuple[str, str, DraftResult]:
+    gaps = research.get("gaps") or []
+
+    base_inputs = {
+        "proof": MY_PROOF,
+        "services": MY_SERVICES,
+        "name": name,
+        "what_they_do": research.get("what_they_do", "not stated"),
+        "audience": research.get("audience", "not stated"),
+        "gaps": "; ".join(gaps) if gaps else "none found",
+        "score_reasoning": score_reasoning or "not available",
+    }
+
+    feedback = ""
+    last_problems: list[str] = []
+
+    for _ in range(MAX_ATTEMPTS):
+        draft = chain.invoke(
+            {
+                **base_inputs,
+                "feedback": feedback,
+            }
+        )
+
+        last_problems = find_problems(draft)
+
+        if not last_problems:
+            full_body = (
+                f"Hi {name} team,\n\n"
+                f"{draft.body.strip()}\n\n"
+                f"Best,\n{MY_NAME}\n{MY_LINK}"
+            )
+
+            return draft.subject.strip(), full_body, draft
+
+        feedback = (
+            "\nYOUR PREVIOUS ATTEMPT WAS REJECTED. Fix these problems: "
+            + " ".join(last_problems)
+        )
+
+    raise ValueError(
+        "Draft failed validation: " + " ".join(last_problems)
+    )
+
+======================================================================
+FILE: evals\cases.json
+======================================================================
+[
+  {"name": "LedgerLoop", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Cloud software that automates invoice reconciliation for freelancers and small agencies.", "audience": "Freelancers and agencies with under 20 employees.", "gaps": ["Blog has not been updated in over a year", "Customer onboarding is described as a manual email process", "No integrations page listing supported tools"], "confidence": "high"}},
+  {"name": "PayNest", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Mobile payments app that lets small merchants accept card and wallet payments.", "audience": "Small shops and market vendors in emerging markets.", "gaps": ["Help center has only a handful of articles", "Support is available only through a contact form", "No customer success stories on the site"], "confidence": "high"}},
+  {"name": "TaxPilot AI", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "AI assistant that helps sole proprietors prepare and file annual tax returns.", "audience": "Self-employed individuals and sole traders.", "gaps": ["Blog published only twice in the last year", "Document upload is reviewed manually by staff", "No automated reminders mentioned for filing deadlines"], "confidence": "high"}},
+  {"name": "BudgetBee", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Personal budgeting app that tracks spending and savings goals.", "audience": "Young professionals new to budgeting.", "gaps": ["No educational guides for first-time users", "Developer or API documentation is missing", "Newsletter signup exists but no content is visible"], "confidence": "high"}},
+  {"name": "InvoiceFlow", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Invoicing platform for small and medium businesses with recurring billing.", "audience": "SMEs and accounting teams.", "gaps": ["Late-payment follow-ups are described as manual", "Few articles explaining recurring billing for beginners", "Support hours are limited to weekdays"], "confidence": "high"}},
+  {"name": "CrediScore Labs", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "API that provides alternative credit scores for lenders using bank transaction data.", "audience": "Small lenders and fintech startups.", "gaps": ["Documentation is short and lacks examples", "No plain-language explainers for non-technical buyers", "No public changelog or status page"], "confidence": "high"}},
+  {"name": "SplitEase", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Expense-splitting app for roommates and travel groups with built-in payments.", "audience": "Students and young travelers.", "gaps": ["No blog or help content", "Support replies are handled by a single shared inbox", "Referral program is mentioned but not explained"], "confidence": "high"}},
+  {"name": "RemitFast", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Money transfer service for migrant workers sending money home.", "audience": "Migrant workers and their families.", "gaps": ["Fee structure is not explained in simple terms", "FAQ mentions manual identity verification steps", "Content is available in English only"], "confidence": "high"}},
+  {"name": "StackBooks", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Bookkeeping software for digital agencies and consultants.", "audience": "Agencies with 5 to 50 employees.", "gaps": ["Receipt capture is done by manual upload", "Blog covers few practical accounting topics", "No automation templates offered"], "confidence": "high"}},
+  {"name": "FinLearn Hub", "tier": "clear", "expected": "contact",
+   "research": {"what_they_do": "Online platform that teaches personal finance and investing basics.", "audience": "Beginner investors and students.", "gaps": ["Content is published irregularly", "No automated email sequence for new subscribers", "Course catalog lacks searchable categories"], "confidence": "high"}},
+  {"name": "MidBank Digital", "tier": "borderline", "expected": "skip",
+   "research": {"what_they_do": "Regional digital bank offering savings accounts and loans, with about 800 employees.", "audience": "Retail banking customers in one country.", "gaps": ["Blog posts are infrequent", "Loan application includes manual document steps", "Help center search is limited"], "confidence": "high"}},
+  {"name": "HealthTrack SaaS", "tier": "borderline", "expected": "contact",
+   "research": {"what_they_do": "Scheduling software for small private clinics.", "audience": "Independent clinics with fewer than 30 staff.", "gaps": ["Onboarding is handled manually by phone", "Blog has very little content", "No automated appointment reminders mentioned"], "confidence": "high"}},
+  {"name": "Khan and Co Accountants", "tier": "borderline", "expected": "contact",
+   "research": {"what_they_do": "Local accounting firm serving small businesses with tax and bookkeeping.", "audience": "Local small business owners.", "gaps": ["No blog or educational content", "Client documents are collected by email", "No online invoicing portal"], "confidence": "high"}},
+  {"name": "FreshMart Online", "tier": "borderline", "expected": "skip",
+   "research": {"what_they_do": "Regional grocery chain with an online ordering store.", "audience": "Local households.", "gaps": ["Orders are confirmed manually by phone", "Little product content online", "No loyalty program information"], "confidence": "high"}},
+  {"name": "Mamas Kitchen", "tier": "clear", "expected": "skip",
+   "research": {"what_they_do": "Family restaurant serving home-style meals.", "audience": "Local diners.", "gaps": ["No online ordering", "Website has only a menu page"], "confidence": "high"}},
+  {"name": "OmniPay Global", "tier": "clear", "expected": "skip",
+   "research": {"what_they_do": "Multinational payment processor with about 40,000 employees serving large enterprises.", "audience": "Global enterprises and banks.", "gaps": ["Few visible gaps because large in-house teams handle content and automation"], "confidence": "high"}},
+  {"name": "Sunrise Yoga Studio", "tier": "clear", "expected": "skip",
+   "research": {"what_they_do": "Neighborhood yoga studio offering classes and workshops.", "audience": "Local residents.", "gaps": ["Class schedule is an image, not text", "No online booking"], "confidence": "high"}},
+  {"name": "BrightSmile Dental", "tier": "clear", "expected": "skip",
+   "research": {"what_they_do": "Dental clinic offering checkups and cosmetic treatments.", "audience": "Local patients.", "gaps": ["Appointment requests are by phone only", "No patient education content"], "confidence": "high"}},
+  {"name": "HardWheels Auto Parts", "tier": "clear", "expected": "skip",
+   "research": {"what_they_do": "Manufacturer and distributor of automotive brake parts.", "audience": "Auto repair shops and dealers.", "gaps": ["Catalog is a downloadable PDF", "No online ordering"], "confidence": "high"}},
+  {"name": "Unreadable Site", "tier": "clear", "expected": "skip",
+   "research": {"what_they_do": "not stated", "audience": "not stated", "gaps": [], "confidence": "low"}}
+]
+
+======================================================================
+FILE: app\scoring_routes.py
+======================================================================
+from fastapi import APIRouter, HTTPException
+
+from app.agents.scoring import run_scoring
+from app.db import supabase
+
+router = APIRouter()
+
+SCORE_THRESHOLD = 50  # Companies scoring below this are skipped
+
+
+def set_status(company_id: str, status: str) -> None:
+    supabase.table("companies").update(
+        {"status": status}
+    ).eq("id", company_id).execute()
+
+
+@router.post("/score/{company_id}")
+def score_company(company_id: str):
+    # 1. Load the company
+    try:
+        res = (
+            supabase.table("companies")
+            .select("*")
+            .eq("id", company_id)
+            .limit(1)
+            .execute()
+        )
+    except Exception:
+        raise HTTPException(status_code=422, detail="Invalid company id")
+
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Company not found")
+
+    company = res.data[0]
+
+    # 2. Load the company's most recent research
+    research_res = (
+        supabase.table("research")
+        .select("*")
+        .eq("company_id", company_id)
+        .order("created_at", desc=True)
+        .limit(1)
+        .execute()
+    )
+
+    if not research_res.data:
+        raise HTTPException(
+            status_code=409,
+            detail="No research found. Run /research/{company_id} first.",
+        )
+
+    research = research_res.data[0].get("raw") or {}
+
+    # 3. Skip thin research without spending another API call
+    if research.get("confidence") == "low":
+        supabase.table("scores").insert(
+            {
+                "company_id": company_id,
+                "fit_score": 0,
+                "reasoning": "Research confidence was low, so this lead was skipped.",
+            }
+        ).execute()
+
+        set_status(company_id, "skipped")
+
+        return {
+            "company": company["name"],
+            "fit_score": 0,
+            "decision": "skip",
+            "reasoning": "Research confidence was low.",
+            "status": "skipped",
+        }
+
+    # 4. Run the scoring agent
+    try:
+        result = run_scoring(company["name"], research)
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Scoring agent error: {e}",
+        )
+
+    score = max(0, min(100, int(result.fit_score)))
+    decision = "contact" if score >= SCORE_THRESHOLD else "skip"
+    status = "scored" if decision == "contact" else "skipped"
+
+    # 5. Save the score
+    try:
+        supabase.table("scores").insert(
+            {
+                "company_id": company_id,
+                "fit_score": score,
+                "reasoning": result.reasoning,
+                "raw": result.model_dump(),
+            }
+        ).execute()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not save score: {e}",
+        )
+
+    set_status(company_id, status)
+
+    return {
+        "company": company["name"],
+        "fit_score": score,
+        "decision": decision,
+        "reasoning": result.reasoning,
+        "matched_services": result.matched_services,
+        "status": status,
+    }

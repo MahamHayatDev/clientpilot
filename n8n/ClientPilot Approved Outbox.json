@@ -1,0 +1,133 @@
+{
+  "name": "ClientPilot Approved Outbox",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a403c054-f086-4a2e-8b42-98eaef52addb",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8000/outbox",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "70d2a416-0e4d-4e78-94a9-b1768df1c0fb",
+      "name": "Get Outbox",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "mahamhayat192@gmail.com",
+        "toEmail": "mahamhayat192@gmail.com",
+        "subject": "=Ready to send: {{ $json.company_name }}",
+        "emailFormat": "text",
+        "text": "=  To: {{ $json.company_name }} ({{ $json.company_website }})\n\n  Subject: {{ $json.subject }}\n\n  {{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "713aa6c6-d944-4d4c-afe8-aa0ed949aa01",
+      "name": "Send To Me",
+      "webhookId": "9eb9fe61-a2e4-484d-9b0e-b9517bf03cd7",
+      "credentials": {
+        "smtp": {
+          "id": "E496et3ssMEVzxyQ",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'http://127.0.0.1:8000/outbox/' + $('Get Outbox').item.json.id + '/logged' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        576,
+        0
+      ],
+      "id": "38e6525f-adcd-4321-bd70-eb7054bbe230",
+      "name": "Mark Delivered"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Outbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Outbox": {
+      "main": [
+        [
+          {
+            "node": "Send To Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send To Me": {
+      "main": [
+        [
+          {
+            "node": "Mark Delivered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Zu5Yd0PZ0eTsSwcf",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "10e30427-4512-4207-88b0-9c4b017163e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f84c121824e406fe65f218b77e64e2023b6cfe7a45b7eea962148713d41093b"
+  },
+  "nodeGroups": [],
+  "id": "VVux4tf3jckSIo3e",
+  "tags": []
+}

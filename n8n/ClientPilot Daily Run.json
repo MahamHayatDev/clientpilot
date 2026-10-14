@@ -1,0 +1,178 @@
+{
+  "name": "ClientPilot Daily Run",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3902b28c-a9e8-47bb-b984-e0a4f703938f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/pipeline-batch?limit=3",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "24b82831-4dc5-43e1-9829-ac31b98bf5e8",
+      "name": "Run Batch"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8000/stats",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "ed017a3c-16c5-4404-a3f2-f67deb7369d2",
+      "name": "Get Stats"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c154b9c7-08a4-4c4d-b648-cf6f85144aec",
+              "leftValue": "={{ $json.waiting }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "c3ee7b30-6760-470b-83dc-54e89eabf95f",
+      "name": "Any Waiting?"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mahamhayat192@gmail.com",
+        "toEmail": "mahamhayat192@gmail.com",
+        "subject": "=ClientPilot: {{ $json.waiting }} draft(s) waiting",
+        "emailFormat": "text",
+        "text": "=You have {{ $json.waiting }} draft(s) waiting for review. Open http://localhost:3000/queue",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "1ef2a1df-634d-4620-82cb-2105cb142f2d",
+      "name": "Send an Email",
+      "webhookId": "d318e7ac-6b57-4afc-9c44-48b7b0e9a68c",
+      "credentials": {
+        "smtp": {
+          "id": "E496et3ssMEVzxyQ",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Batch": {
+      "main": [
+        [
+          {
+            "node": "Get Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Stats": {
+      "main": [
+        [
+          {
+            "node": "Any Waiting?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Waiting?": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Zu5Yd0PZ0eTsSwcf",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedPerExecution": 0
+  },
+  "versionId": "1c11e87e-5d99-4cfe-98aa-83601b687969",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f84c121824e406fe65f218b77e64e2023b6cfe7a45b7eea962148713d41093b"
+  },
+  "nodeGroups": [],
+  "id": "r8inM9xUkyN0iYh4",
+  "tags": []
+}

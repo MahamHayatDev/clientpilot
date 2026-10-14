@@ -1,0 +1,199 @@
+{
+  "scoring": {
+    "cases": 20,
+    "completed": 19,
+    "failed": 1,
+    "accuracy": 95,
+    "accuracy_clear": 100,
+    "accuracy_borderline": 75,
+    "precision_contact": 92,
+    "recall_contact": 100,
+    "avg_score_good_leads": 77.6,
+    "avg_score_bad_leads": 23.1,
+    "consistency_avg_diff": null,
+    "consistency_max_diff": null,
+    "rows": [
+      {
+        "name": "LedgerLoop",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 85,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "PayNest",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 85,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "TaxPilot AI",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 85,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "BudgetBee",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 82,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "InvoiceFlow",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 85,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "CrediScore Labs",
+        "tier": "clear",
+        "expected": "contact",
+        "score": null,
+        "decision": "error",
+        "correct": null,
+        "error": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+      },
+      {
+        "name": "SplitEase",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 75,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "RemitFast",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 75,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "StackBooks",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 85,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "FinLearn Hub",
+        "tier": "clear",
+        "expected": "contact",
+        "score": 75,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "MidBank Digital",
+        "tier": "borderline",
+        "expected": "skip",
+        "score": 60,
+        "decision": "contact",
+        "correct": false,
+        "error": null
+      },
+      {
+        "name": "HealthTrack SaaS",
+        "tier": "borderline",
+        "expected": "contact",
+        "score": 60,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "Khan and Co Accountants",
+        "tier": "borderline",
+        "expected": "contact",
+        "score": 62,
+        "decision": "contact",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "FreshMart Online",
+        "tier": "borderline",
+        "expected": "skip",
+        "score": 45,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "Mamas Kitchen",
+        "tier": "clear",
+        "expected": "skip",
+        "score": 10,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "OmniPay Global",
+        "tier": "clear",
+        "expected": "skip",
+        "score": 25,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "Sunrise Yoga Studio",
+        "tier": "clear",
+        "expected": "skip",
+        "score": 15,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "BrightSmile Dental",
+        "tier": "clear",
+        "expected": "skip",
+        "score": 15,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "HardWheels Auto Parts",
+        "tier": "clear",
+        "expected": "skip",
+        "score": 15,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      },
+      {
+        "name": "Unreadable Site",
+        "tier": "clear",
+        "expected": "skip",
+        "score": 0,
+        "decision": "skip",
+        "correct": true,
+        "error": null
+      }
+    ]
+  },
+  "drafting": null
+}
