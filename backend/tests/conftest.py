@@ -8,3 +8,5 @@ os.environ.setdefault(
     "SUPABASE_SERVICE_KEY",
     "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZSJ9.c2lnbmF0dXJl",
 )
+os.environ.setdefault("API_KEY", "test-api-key-for-unit-tests-only")
+os.environ.setdefault("ENVIRONMENT", "development")

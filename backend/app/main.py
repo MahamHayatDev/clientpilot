@@ -1,8 +1,10 @@
 import logging
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.auth import require_api_key
+from app.config import ENVIRONMENT
 from app.agents.research import run_research
 from app.db import supabase
 from app.scoring_routes import router as scoring_router
@@ -23,7 +25,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-app = FastAPI(title="ClientPilot API")
+# Configure API authentication and documentation
+IS_PROD = ENVIRONMENT == "production"
+
+app = FastAPI(
+    title="ClientPilot API",
+    dependencies=[Depends(require_api_key)],
+    docs_url=None if IS_PROD else "/docs",
+    redoc_url=None,
+    openapi_url=None if IS_PROD else "/openapi.json",
+)
 
 
 # Allow the Next.js dashboard to communicate with FastAPI
@@ -160,7 +171,10 @@ def research_company(company_id: str):
         )
         raise HTTPException(
             status_code=500,
-            detail="Research was saved, but company status could not be updated.",
+            detail=(
+                "Research was saved, but company status "
+                "could not be updated."
+            ),
         )
 
     logger.info(

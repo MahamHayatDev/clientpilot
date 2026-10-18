@@ -1,5 +1,4 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+const BASE = "/api/proxy";
 
 // ---------- Types ----------
 
@@ -59,6 +58,31 @@ export type DashboardStats = {
   approval_rate: number | null;
 };
 
+export type BulkResult = {
+  added: number;
+  skipped: number;
+};
+
+export type PipelineResult = {
+  company?: string;
+  final_status?: string;
+  score?: number | null;
+  decision?: string;
+  subject?: string | null;
+  error?: string | null;
+  log?: string[];
+};
+
+export type DraftUpdateResult = {
+  id: string;
+  approval_status: string;
+};
+
+export type CompanyInput = {
+  name: string;
+  website: string;
+};
+
 // ---------- Request helper ----------
 
 async function request<T>(
@@ -68,7 +92,7 @@ async function request<T>(
   let response: Response;
 
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    response = await fetch(`${BASE}${path}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -108,13 +132,11 @@ export function listCompanies() {
 }
 
 export function companyDetail(id: string) {
-  return request<CompanyDetail>(
-    `/companies/${encodeURIComponent(id)}`
-  );
+  return request<CompanyDetail>(`/companies/${encodeURIComponent(id)}`);
 }
 
-export function bulkAdd(companies: { name: string; website: string }[]) {
-  return request<{ added: number; skipped: number }>("/companies/bulk", {
+export function bulkAdd(companies: CompanyInput[]) {
+  return request<BulkResult>("/companies/bulk", {
     method: "POST",
     body: JSON.stringify({ companies }),
   });
@@ -123,25 +145,16 @@ export function bulkAdd(companies: { name: string; website: string }[]) {
 // ---------- Pipeline ----------
 
 export function runPipeline(id: string, force = false) {
-  return request<{
-    company?: string;
-    final_status?: string;
-    score?: number | null;
-    decision?: string;
-    subject?: string | null;
-    error?: string | null;
-    log?: string[];
-  }>(
+  return request<PipelineResult>(
     `/pipeline/${encodeURIComponent(id)}?force=${force}`,
     { method: "POST" }
   );
 }
 
 export function runBatch(limit = 3) {
-  return request<unknown>(
-    `/pipeline-batch?limit=${limit}`,
-    { method: "POST" }
-  );
+  return request<unknown>(`/pipeline-batch?limit=${limit}`, {
+    method: "POST",
+  });
 }
 
 // ---------- Draft approval queue ----------
@@ -149,34 +162,25 @@ export function runBatch(limit = 3) {
 export function listDrafts(
   view: "waiting" | "approved" | "rejected" = "waiting"
 ) {
-  return request<Draft[]>(
-    `/drafts?view=${encodeURIComponent(view)}`
-  );
+  return request<Draft[]>(`/drafts?view=${encodeURIComponent(view)}`);
 }
 
-export function editDraft(
-  id: string,
-  subject: string,
-  body: string
-) {
-  return request<{ id: string; approval_status: string }>(
-    `/drafts/${encodeURIComponent(id)}`,
-    {
-      method: "PATCH",
-      body: JSON.stringify({ subject, body }),
-    }
-  );
+export function editDraft(id: string, subject: string, body: string) {
+  return request<DraftUpdateResult>(`/drafts/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ subject, body }),
+  });
 }
 
 export function approveDraft(id: string) {
-  return request<{ id: string; approval_status: string }>(
+  return request<DraftUpdateResult>(
     `/drafts/${encodeURIComponent(id)}/approve`,
     { method: "POST" }
   );
 }
 
 export function rejectDraft(id: string) {
-  return request<{ id: string; approval_status: string }>(
+  return request<DraftUpdateResult>(
     `/drafts/${encodeURIComponent(id)}/reject`,
     { method: "POST" }
   );
