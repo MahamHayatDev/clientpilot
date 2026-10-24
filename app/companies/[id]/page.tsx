@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../../lib/api";
 import { StatusBadge } from "../../lib/ui";
 
-export default function CompanyDetailPage() {
+function CompanyDetailContent() {
   const params = useParams();
   const id = String(params.id);
 
@@ -362,5 +362,19 @@ export default function CompanyDetailPage() {
         )}
       </section>
     </main>
+  );
+}
+
+export default function CompanyDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto max-w-5xl px-6 py-10">
+          <p className="text-sm text-slate-500">Loading company details...</p>
+        </main>
+      }
+    >
+      <CompanyDetailContent />
+    </Suspense>
   );
 }

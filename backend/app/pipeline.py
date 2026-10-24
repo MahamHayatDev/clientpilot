@@ -1,4 +1,4 @@
-import operator
+﻿import operator
 import time
 from typing import Annotated, TypedDict
 
@@ -208,13 +208,19 @@ def score_node(state: PipelineState) -> dict:
             "Research confidence was low, so this lead was skipped."
         )
 
-        supabase.table("scores").insert(
-            {
-                "company_id": cid,
-                "fit_score": 0,
-                "reasoning": reasoning,
+        try:
+            supabase.table("scores").insert(
+                {
+                    "company_id": cid,
+                    "fit_score": 0,
+                    "reasoning": reasoning,
+                }
+            ).execute()
+        except Exception as e:
+            return {
+                "error": f"Could not save score: {short(e)}",
+                "log": ["score: save failed"],
             }
-        ).execute()
 
         set_status(cid, "skipped")
 
@@ -224,7 +230,6 @@ def score_node(state: PipelineState) -> dict:
             "score_reasoning": reasoning,
             "log": ["score: skipped (low research confidence)"],
         }
-
     # Scoring LLM: up to 3 attempts, with 10s then 20s waits.
     try:
         result = with_retry(

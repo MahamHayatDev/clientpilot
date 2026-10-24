@@ -1,17 +1,165 @@
 {
   "scoring": {
     "cases": 20,
-    "completed": 19,
-    "failed": 1,
+    "completed": 20,
+    "failed": 0,
     "accuracy": 95,
     "accuracy_clear": 100,
     "accuracy_borderline": 75,
     "precision_contact": 92,
     "recall_contact": 100,
-    "avg_score_good_leads": 77.6,
-    "avg_score_bad_leads": 23.1,
-    "consistency_avg_diff": null,
-    "consistency_max_diff": null,
+    "avg_score_good_leads": 69.5,
+    "avg_score_bad_leads": 26.5,
+    "consistency_avg_diff": 3,
+    "consistency_max_diff": 6,
+    "category_consistency_avg_diff": {
+      "industry_fit": 1.2,
+      "visible_need": 1.2,
+      "reachability": 0.6,
+      "evidence_quality": 0
+    },
+    "consistency_rows": [
+      {
+        "name": "LedgerLoop",
+        "first_score": 85,
+        "second_score": 88,
+        "absolute_score_difference": 3,
+        "category_comparison": {
+          "industry_fit": {
+            "first": 32,
+            "second": 35,
+            "absolute_difference": 3
+          },
+          "visible_need": {
+            "first": 28,
+            "second": 28,
+            "absolute_difference": 0
+          },
+          "reachability": {
+            "first": 16,
+            "second": 16,
+            "absolute_difference": 0
+          },
+          "evidence_quality": {
+            "first": 9,
+            "second": 9,
+            "absolute_difference": 0
+          }
+        }
+      },
+      {
+        "name": "PayNest",
+        "first_score": 65,
+        "second_score": 68,
+        "absolute_score_difference": 3,
+        "category_comparison": {
+          "industry_fit": {
+            "first": 30,
+            "second": 30,
+            "absolute_difference": 0
+          },
+          "visible_need": {
+            "first": 15,
+            "second": 15,
+            "absolute_difference": 0
+          },
+          "reachability": {
+            "first": 12,
+            "second": 15,
+            "absolute_difference": 3
+          },
+          "evidence_quality": {
+            "first": 8,
+            "second": 8,
+            "absolute_difference": 0
+          }
+        }
+      },
+      {
+        "name": "TaxPilot AI",
+        "first_score": 79,
+        "second_score": 82,
+        "absolute_score_difference": 3,
+        "category_comparison": {
+          "industry_fit": {
+            "first": 30,
+            "second": 30,
+            "absolute_difference": 0
+          },
+          "visible_need": {
+            "first": 25,
+            "second": 28,
+            "absolute_difference": 3
+          },
+          "reachability": {
+            "first": 15,
+            "second": 15,
+            "absolute_difference": 0
+          },
+          "evidence_quality": {
+            "first": 9,
+            "second": 9,
+            "absolute_difference": 0
+          }
+        }
+      },
+      {
+        "name": "BudgetBee",
+        "first_score": 64,
+        "second_score": 64,
+        "absolute_score_difference": 0,
+        "category_comparison": {
+          "industry_fit": {
+            "first": 30,
+            "second": 30,
+            "absolute_difference": 0
+          },
+          "visible_need": {
+            "first": 10,
+            "second": 10,
+            "absolute_difference": 0
+          },
+          "reachability": {
+            "first": 15,
+            "second": 15,
+            "absolute_difference": 0
+          },
+          "evidence_quality": {
+            "first": 9,
+            "second": 9,
+            "absolute_difference": 0
+          }
+        }
+      },
+      {
+        "name": "InvoiceFlow",
+        "first_score": 86,
+        "second_score": 80,
+        "absolute_score_difference": 6,
+        "category_comparison": {
+          "industry_fit": {
+            "first": 33,
+            "second": 30,
+            "absolute_difference": 3
+          },
+          "visible_need": {
+            "first": 28,
+            "second": 25,
+            "absolute_difference": 3
+          },
+          "reachability": {
+            "first": 16,
+            "second": 16,
+            "absolute_difference": 0
+          },
+          "evidence_quality": {
+            "first": 9,
+            "second": 9,
+            "absolute_difference": 0
+          }
+        }
+      }
+    ],
     "rows": [
       {
         "name": "LedgerLoop",
@@ -20,168 +168,390 @@
         "score": 85,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 32,
+          "visible_need": 28,
+          "reachability": 16,
+          "evidence_quality": 9
+        },
+        "category_total": 85,
+        "category_total_matches": true,
+        "reasoning": "LedgerLoop operates directly in the financial and automation software space, aligning well with the freelancer's fintech and workflow automation capabilities. The documented manual email onboarding process provides a clear, credible operational gap that matches workflow automation services. Furthermore, their small target audience size and high-confidence research suggest they are realistically reachable for a direct freelancer engagement.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph",
+          "Fintech workflow automation: document extraction, anomaly flagging, dashboards"
+        ],
         "error": null
       },
       {
         "name": "PayNest",
         "tier": "clear",
         "expected": "contact",
-        "score": 85,
+        "score": 65,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 15,
+          "reachability": 12,
+          "evidence_quality": 8
+        },
+        "category_total": 65,
+        "category_total_matches": true,
+        "reasoning": "PayNest operates in the mobile payments and merchant services sector, showing a strong industry fit for fintech workflow automation. However, the identified gaps regarding support options and missing help content only weakly indicate a need for support triage or information workflows without confirmed operational burdens. Direct freelancer reachability is moderately plausible given their small-to-mid startup scope.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph"
+        ],
         "error": null
       },
       {
         "name": "TaxPilot AI",
         "tier": "clear",
         "expected": "contact",
-        "score": 85,
+        "score": 79,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 25,
+          "reachability": 15,
+          "evidence_quality": 9
+        },
+        "category_total": 79,
+        "category_total_matches": true,
+        "reasoning": "TaxPilot AI is an AI-driven tax preparation tool for sole proprietors, representing a strong industry alignment. The research notes that document uploads are reviewed manually by staff, creating a credible practical use for document extraction and workflow automation services. Reachability is plausible given the early-stage nature of an AI assistant startup.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph"
+        ],
         "error": null
       },
       {
         "name": "BudgetBee",
         "tier": "clear",
         "expected": "contact",
-        "score": 82,
+        "score": 64,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 10,
+          "reachability": 15,
+          "evidence_quality": 9
+        },
+        "category_total": 64,
+        "category_total_matches": true,
+        "reasoning": "BudgetBee operates in the personal finance and SaaS space, providing a strong industry fit. However, the research gaps mainly point to missing developer documentation and content rather than documented backend or workflow automation needs, limiting the visible service need. Given the small startup profile implied by the app focus, direct freelancer reachability is moderately plausible.",
+        "matched_services": [
+          "Backend and API development: FastAPI services and integrations"
+        ],
         "error": null
       },
       {
         "name": "InvoiceFlow",
         "tier": "clear",
         "expected": "contact",
-        "score": 85,
+        "score": 86,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 33,
+          "visible_need": 28,
+          "reachability": 16,
+          "evidence_quality": 9
+        },
+        "category_total": 86,
+        "category_total_matches": true,
+        "reasoning": "InvoiceFlow operates directly in the invoicing and billing space, showing a strong industry fit. Research highlights specific manual late-payment follow-ups, aligning well with communication and workflow automation services. Furthermore, their small-to-medium business focus makes direct freelancer engagement realistic based on the provided high-confidence data.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph"
+        ],
         "error": null
       },
       {
         "name": "CrediScore Labs",
         "tier": "clear",
         "expected": "contact",
-        "score": null,
-        "decision": "error",
-        "correct": null,
-        "error": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+        "score": 64,
+        "decision": "contact",
+        "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 10,
+          "reachability": 15,
+          "evidence_quality": 9
+        },
+        "category_total": 64,
+        "category_total_matches": true,
+        "reasoning": "CrediScore Labs operates in the fintech and API sector, creating a strong industry fit for backend development. However, the documented gaps relate solely to developer documentation and missing plain-language resources rather than operational workflows, limiting the direct need for automation or custom services. Reachability is moderately plausible for an early-stage API provider, and the high-confidence research clearly supports the company's profile.",
+        "matched_services": [
+          "Backend and API development: FastAPI services and integrations"
+        ],
+        "error": null
       },
       {
         "name": "SplitEase",
         "tier": "clear",
         "expected": "contact",
-        "score": 75,
+        "score": 68,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 15,
+          "reachability": 15,
+          "evidence_quality": 8
+        },
+        "category_total": 68,
+        "category_total_matches": true,
+        "reasoning": "SplitEase operates in the payments and expense-splitting space, giving it a strong industry fit for the freelancer's fintech workflow and automation services. However, the visible need is limited to handling support through a single shared inbox, which moderately supports support triage automation. Direct reachability is reasonably plausible given the early-stage nature of an expense-splitting app for students and travelers.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph (support triage)"
+        ],
         "error": null
       },
       {
         "name": "RemitFast",
         "tier": "clear",
         "expected": "contact",
-        "score": 75,
+        "score": 74,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 20,
+          "reachability": 15,
+          "evidence_quality": 9
+        },
+        "category_total": 74,
+        "category_total_matches": true,
+        "reasoning": "RemitFast operates in the payments and remittance sector, creating a strong alignment for workflow and automation services. The research notes manual identity verification steps in their FAQ, offering a plausible opportunity for document extraction or backend integration. Direct freelancer reachability is moderately plausible given their startup nature, backed by high-confidence research.",
+        "matched_services": [
+          "Fintech workflow automation: document extraction, anomaly flagging, dashboards.",
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph"
+        ],
         "error": null
       },
       {
         "name": "StackBooks",
         "tier": "clear",
         "expected": "contact",
-        "score": 85,
+        "score": 76,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 30,
+          "visible_need": 22,
+          "reachability": 15,
+          "evidence_quality": 9
+        },
+        "category_total": 76,
+        "category_total_matches": true,
+        "reasoning": "StackBooks provides SaaS bookkeeping software to digital agencies, creating a strong industry and service alignment. The manual receipt capture gap creates a practical opening for document extraction and workflow automation. As a small software company targeting modest-sized agencies, direct freelancer reachability is plausible based on the available research evidence.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph",
+          "Fintech workflow automation: document extraction, anomaly flagging, dashboards"
+        ],
         "error": null
       },
       {
         "name": "FinLearn Hub",
         "tier": "clear",
         "expected": "contact",
-        "score": 75,
+        "score": 58,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 20,
+          "visible_need": 15,
+          "reachability": 15,
+          "evidence_quality": 8
+        },
+        "category_total": 58,
+        "category_total_matches": true,
+        "reasoning": "FinLearn Hub operates in personal finance education with a relevant business model, though it is not a pure SaaS or fintech firm. The research indicates a lack of automated email sequences and searchable course categories, pointing to potential workflow or backend optimization needs. However, these gaps represent general website improvements rather than confirmed technical automation demands.",
+        "matched_services": [
+          "AI automation",
+          "Backend and API development"
+        ],
         "error": null
       },
       {
         "name": "MidBank Digital",
         "tier": "borderline",
         "expected": "skip",
-        "score": 60,
+        "score": 67,
         "decision": "contact",
         "correct": false,
+        "category_scores": {
+          "industry_fit": 28,
+          "visible_need": 20,
+          "reachability": 10,
+          "evidence_quality": 9
+        },
+        "category_total": 67,
+        "category_total_matches": true,
+        "reasoning": "MidBank Digital operates in retail banking with around 800 employees, showing a relevant business model for fintech-related workflows. The research identifies manual document steps in loan applications, creating a plausible opportunity for document extraction and workflow automation, though its larger size introduces moderate reachability barriers for an individual freelancer.",
+        "matched_services": [
+          "Fintech workflow automation: document extraction, anomaly flagging, dashboards",
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph"
+        ],
         "error": null
       },
       {
         "name": "HealthTrack SaaS",
         "tier": "borderline",
         "expected": "contact",
-        "score": 60,
+        "score": 61,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 22,
+          "visible_need": 15,
+          "reachability": 16,
+          "evidence_quality": 8
+        },
+        "category_total": 61,
+        "category_total_matches": true,
+        "reasoning": "HealthTrack SaaS operates a B2B software model with a relevant use case for communication automation in onboarding and reminders. The research identifies manual phone-based onboarding and a lack of appointment reminders as plausible operational gaps, though the evidence is limited to high-level observations. Given the small target size of independent clinics, the company is approachable for an individual freelancer.",
+        "matched_services": [
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph"
+        ],
         "error": null
       },
       {
         "name": "Khan and Co Accountants",
         "tier": "borderline",
         "expected": "contact",
-        "score": 62,
+        "score": 54,
         "decision": "contact",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 15,
+          "visible_need": 15,
+          "reachability": 15,
+          "evidence_quality": 9
+        },
+        "category_total": 54,
+        "category_total_matches": true,
+        "reasoning": "Khan and Co Accountants is a local accounting firm with an indirect connection to fintech workflows. The research indicates manual document collection via email and a lack of an online invoicing portal, creating a moderate opportunity for document extraction or workflow automation. As a small local business, direct access is plausible, though their operational scale limits the urgency and budget for custom technical solutions.",
+        "matched_services": [
+          "Fintech workflow automation: document extraction, anomaly flagging, dashboards.",
+          "AI automation: building workflows and agents with n8n, LangChain and LangGraph (invoice processing, lead research, support triage, reporting, approval flows)."
+        ],
         "error": null
       },
       {
         "name": "FreshMart Online",
         "tier": "borderline",
         "expected": "skip",
-        "score": 45,
+        "score": 33,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 5,
+          "visible_need": 10,
+          "reachability": 10,
+          "evidence_quality": 8
+        },
+        "category_total": 33,
+        "category_total_matches": true,
+        "reasoning": "FreshMart Online is a regional grocery chain operating outside the freelancer's core fintech or SaaS focus. Although they have a manual order confirmation process, the evidence is too limited to establish a credible technical service match beyond general web development. Therefore, the company is not a realistic prospect and should be skipped.",
+        "matched_services": [],
         "error": null
       },
       {
         "name": "Mamas Kitchen",
         "tier": "clear",
         "expected": "skip",
-        "score": 10,
+        "score": 18,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 0,
+          "visible_need": 0,
+          "reachability": 10,
+          "evidence_quality": 8
+        },
+        "category_total": 18,
+        "category_total_matches": true,
+        "reasoning": "Mamas Kitchen is a local family restaurant operating completely outside the freelancer's target domains of fintech, SaaS, or AI automation. The research shows a lack of online ordering, but this is a standard e-commerce or point-of-sale requirement rather than a need for AI workflows, FastAPI services, or fintech engineering.",
+        "matched_services": [],
         "error": null
       },
       {
         "name": "OmniPay Global",
         "tier": "clear",
         "expected": "skip",
-        "score": 25,
+        "score": 28,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 20,
+          "visible_need": 0,
+          "reachability": 0,
+          "evidence_quality": 8
+        },
+        "category_total": 28,
+        "category_total_matches": true,
+        "reasoning": "OmniPay Global operates in the payments industry, but its massive size of approximately 40,000 employees and reliance on large in-house teams make it entirely unsuitable for an individual freelancer. The research confirms there are no visible operational gaps or opportunities for external automation services.",
+        "matched_services": [],
         "error": null
       },
       {
         "name": "Sunrise Yoga Studio",
         "tier": "clear",
         "expected": "skip",
-        "score": 15,
+        "score": 20,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 2,
+          "visible_need": 0,
+          "reachability": 10,
+          "evidence_quality": 8
+        },
+        "category_total": 20,
+        "category_total_matches": true,
+        "reasoning": "Sunrise Yoga Studio is a local neighborhood yoga business with no connection to fintech, SaaS, or AI automation. The research notes gaps like image-based schedules and lack of online booking, but these require standard web development rather than the freelancer's specialized AI, backend, or workflow automation services.",
+        "matched_services": [],
         "error": null
       },
       {
         "name": "BrightSmile Dental",
         "tier": "clear",
         "expected": "skip",
-        "score": 15,
+        "score": 18,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 0,
+          "visible_need": 0,
+          "reachability": 10,
+          "evidence_quality": 8
+        },
+        "category_total": 18,
+        "category_total_matches": true,
+        "reasoning": "BrightSmile Dental is a local dental clinic with no connection to fintech, SaaS, or AI-adjacent operations. The research notes that appointment requests are by phone only, which does not present a credible technical service match for the freelancer's offerings. Therefore, this company is not a realistic prospect.",
+        "matched_services": [],
         "error": null
       },
       {
         "name": "HardWheels Auto Parts",
         "tier": "clear",
         "expected": "skip",
-        "score": 15,
+        "score": 28,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": 5,
+          "visible_need": 5,
+          "reachability": 10,
+          "evidence_quality": 8
+        },
+        "category_total": 28,
+        "category_total_matches": true,
+        "reasoning": "HardWheels Auto Parts operates as an automotive brake parts manufacturer rather than a fintech, payments, SaaS, or AI-adjacent company. While their downloadable PDF catalog indicates manual ordering processes, this does not establish a clear need for the freelancer's specific automation, backend, or fintech services. Consequently, the company is not a realistic prospect and falls below the contact threshold.",
+        "matched_services": [],
         "error": null
       },
       {
@@ -191,9 +561,83 @@
         "score": 0,
         "decision": "skip",
         "correct": true,
+        "category_scores": {
+          "industry_fit": null,
+          "visible_need": null,
+          "reachability": null,
+          "evidence_quality": null
+        },
+        "category_total": null,
+        "category_total_matches": null,
+        "reasoning": "Research confidence is low; lead skipped.",
+        "matched_services": [],
         "error": null
       }
     ]
   },
-  "drafting": null
+  "drafting": {
+    "cases": 8,
+    "completed": 8,
+    "failed": 0,
+    "pass_rate": 100,
+    "avg_words": 66,
+    "rows": [
+      {
+        "name": "LedgerLoop",
+        "ok": true,
+        "problems": [],
+        "words": 70,
+        "error": null
+      },
+      {
+        "name": "PayNest",
+        "ok": true,
+        "problems": [],
+        "words": 84,
+        "error": null
+      },
+      {
+        "name": "TaxPilot AI",
+        "ok": true,
+        "problems": [],
+        "words": 44,
+        "error": null
+      },
+      {
+        "name": "BudgetBee",
+        "ok": true,
+        "problems": [],
+        "words": 58,
+        "error": null
+      },
+      {
+        "name": "InvoiceFlow",
+        "ok": true,
+        "problems": [],
+        "words": 52,
+        "error": null
+      },
+      {
+        "name": "CrediScore Labs",
+        "ok": true,
+        "problems": [],
+        "words": 79,
+        "error": null
+      },
+      {
+        "name": "SplitEase",
+        "ok": true,
+        "problems": [],
+        "words": 75,
+        "error": null
+      },
+      {
+        "name": "RemitFast",
+        "ok": true,
+        "problems": [],
+        "words": 64,
+        "error": null
+      }
+    ]
+  }
 }
