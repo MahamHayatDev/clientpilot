@@ -79,7 +79,6 @@ export default function CompaniesPage() {
             );
           }
 
-          // Use a distinct name for the API response.
           const uploadResult = await bulkAdd(rows);
 
           setMessage(
@@ -172,8 +171,9 @@ export default function CompaniesPage() {
     (company) => company.status === "drafted"
   ).length;
 
+  // Include failed companies so they can be retried.
   const newCount = companies.filter(
-    (company) => company.status === "new"
+    (company) => ["new", "failed"].includes(company.status)
   ).length;
 
   const averageScore = (() => {

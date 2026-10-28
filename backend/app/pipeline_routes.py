@@ -33,14 +33,20 @@ def _release(company_id: str) -> None:
 @router.post("/pipeline/{company_id}")
 def pipeline_one(company_id: str, force: bool = False):
     if not _claim(company_id):
-        raise HTTPException(status_code=409, detail="This company is already being processed")
+        raise HTTPException(
+            status_code=409,
+            detail="This company is already being processed",
+        )
 
     started = time.time()
     try:
         result = run_pipeline(company_id, force=force)
     except Exception as e:
         log.exception("pipeline crashed for %s", company_id)
-        raise HTTPException(status_code=500, detail=f"Pipeline crashed: {str(e)[:300]}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Pipeline crashed: {str(e)[:300]}",
+        )
     finally:
         _release(company_id)
 
@@ -56,6 +62,7 @@ def pipeline_one(company_id: str, force: bool = False):
         raise HTTPException(status_code=404, detail="Company not found")
     if result["error"] == "Invalid company id":
         raise HTTPException(status_code=422, detail="Invalid company id")
+
     return result
 
 
@@ -63,16 +70,20 @@ def pipeline_one(company_id: str, force: bool = False):
 def pipeline_batch(limit: int = Query(5, ge=1, le=10)):
     with _lock:
         if _state["batch"]:
-            raise HTTPException(status_code=409, detail="A batch is already running")
+            raise HTTPException(
+                status_code=409,
+                detail="A batch is already running",
+            )
         _state["batch"] = True
 
     started = time.time()
     results = []
+
     try:
         res = (
             supabase.table("companies")
             .select("id,name")
-            .eq("status", "new")
+            .in_("status", ["new", "failed"])
             .order("created_at")
             .limit(limit)
             .execute()
@@ -83,7 +94,7 @@ def pipeline_batch(limit: int = Query(5, ge=1, le=10)):
                 results.append(
                     {
                         "company": company["name"],
-                        "final_status": "new",
+                        "final_status": company.get("status", "new"),
                         "score": None,
                         "error": "Already being processed elsewhere",
                     }
@@ -92,10 +103,14 @@ def pipeline_batch(limit: int = Query(5, ge=1, le=10)):
 
             if i > 0:
                 time.sleep(BATCH_DELAY_SECONDS)
+
             try:
                 outcome = run_pipeline(company["id"])
             except Exception as e:
-                log.exception("batch item crashed for %s", company["id"])
+                log.exception(
+                    "batch item crashed for %s",
+                    company["id"],
+                )
                 outcome = {
                     "company": company["name"],
                     "final_status": "failed",
@@ -112,9 +127,18 @@ def pipeline_batch(limit: int = Query(5, ge=1, le=10)):
                     "error": outcome.get("error"),
                 }
             )
+
     finally:
         with _lock:
             _state["batch"] = False
 
-    log.info("batch finished: %d companies in %.1fs", len(results), time.time() - started)
-    return {"processed": len(results), "results": results}
+    log.info(
+        "batch finished: %d companies in %.1fs",
+        len(results),
+        time.time() - started,
+    )
+
+    return {
+        "processed": len(results),
+        "results": results,
+    }
