@@ -237,7 +237,7 @@ export default function CompaniesPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard label="Total companies" value={companies.length} />
-        <MetricCard label="New to process" value={newCount} />
+        <MetricCard label="Ready to process" value={newCount} />
         <MetricCard label="Drafts created" value={draftedCount} />
         <MetricCard
           label="Average fit score"
