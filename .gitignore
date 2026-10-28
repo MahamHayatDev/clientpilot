@@ -45,3 +45,5 @@ backend/.env
 .pytest_cache/
 
 *.bak
+
+!.env.example
