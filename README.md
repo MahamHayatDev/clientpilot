@@ -1,20 +1,33 @@
 # ClientPilot
 
-**AI-powered lead research, scoring, and outreach drafting with human approval.**
+**AI-powered lead research, scoring, and outreach drafting, with a human approving every message.**
 
-ClientPilot helps freelancers identify companies that may benefit from their services. It researches companies, evaluates their fit against a defined scoring rubric, and drafts personalized outreach messages. Every draft remains under human control until it is reviewed and approved.
+Freelancers lose hours researching companies and writing cold emails that sound generic. ClientPilot automates the research and first draft: it studies a company's website, scores how good a fit it is against a transparent rubric, and writes a personalized outreach draft based on what it found. Nothing is sent until a person reviews and approves it.
 
-**Demo video:** Coming soon.
+<!-- After you record it, uncomment this line and add your link:
+**Demo video:** [Watch the 3-minute walkthrough](ADD_LINK_HERE)
+-->
+
+<!-- After you take a screenshot, save it as public/screenshot.png, then uncomment:
+![ClientPilot dashboard](public/screenshot.png)
+-->
+
+## What It Does
+
+1. **Researches** a company from its website: what it does, who it serves, and where its operations show gaps.
+2. **Scores** the lead out of 100 using a fixed rubric (see [Lead Scoring](#lead-scoring)).
+3. **Drafts** a short outreach email tied to specific findings, not generic templates.
+4. **Waits for you.** Every draft is reviewed, edited, approved, or rejected in the dashboard before you send it manually.
 
 ## Key Features
 
-* **Company research:** Extracts company information, target audience, and potential operational gaps from website research.
-* **Lead scoring:** Evaluates industry fit, visible need, reachability, and evidence quality.
-* **Personalized outreach:** Generates drafts connected to specific findings from the research.
-* **Human approval:** Allows drafts to be reviewed, edited, approved, or rejected before they are sent manually.
-* **Workflow automation:** Uses n8n to schedule pipeline runs and deliver approved drafts.
-* **Evaluation suite:** Measures scoring accuracy, contact precision and recall, repeat-run consistency, and draft quality.
-* **Security controls:** Uses API-key authentication for backend requests and login protection for the dashboard.
+- **Company research:** Extracts company information, target audience, and potential operational gaps from website content.
+- **Lead scoring:** Evaluates industry fit, visible need, reachability, and evidence quality.
+- **Personalized outreach:** Generates drafts connected to specific research findings.
+- **Human approval:** Drafts can be reviewed, edited, approved, or rejected before manual sending.
+- **Workflow automation:** n8n schedules pipeline runs and delivers approved drafts.
+- **Evaluation suite:** Measures scoring accuracy, contact precision and recall, repeat-run consistency, and draft quality.
+- **Security controls:** API-key authentication for backend requests and login protection for the dashboard.
 
 ## Architecture
 
@@ -47,7 +60,7 @@ flowchart LR
 
 ## Lead Scoring
 
-Each company receives a score out of 100 based on four categories.
+Each company receives a score out of 100 across four categories.
 
 | Category         | Maximum points |
 | ---------------- | -------------: |
@@ -57,12 +70,12 @@ Each company receives a score out of 100 based on four categories.
 | Evidence quality |             10 |
 | **Total**        |        **100** |
 
-The final score is calculated from the four category scores. The current contact threshold is 50:
+The current contact threshold is 50:
 
-* **Below 50:** Skip the lead.
-* **50 or above:** Mark the lead for contact, subject to the workflow's validation and human-review process.
+- **Below 50:** Skip the lead.
+- **50 or above:** Mark the lead for contact, subject to the workflow's validation and human-review process.
 
-The score supports decision-making; it does not guarantee that a company will become a client.
+The score supports decision-making. It does not guarantee that a company will become a client.
 
 ## Evaluation Results
 
@@ -112,93 +125,100 @@ The drafting checks flag unsupported numbers, banned phrases, and mismatches bet
 
 ## Design Decisions
 
-* **Human in the loop:** Outreach drafts are reviewed before manual sending.
-* **Structured output:** Agent responses use validated schemas.
-* **Rules in code, judgment in the model:** The model evaluates lead fit, while application code applies the contact threshold.
-* **Evidence-based scoring:** Scores should reflect researched facts rather than unsupported assumptions about company needs, budgets, or hiring intentions.
-* **Resumable workflow:** The pipeline can continue from a company's current status.
-* **Security:** The dashboard uses a server-side proxy for authenticated backend requests. API keys should remain on the server, never in browser-accessible code.
-* **Reliability:** The project includes retry handling, per-company run locks, structured logs, and health checks.
+- **Human in the loop:** Outreach drafts are reviewed before manual sending.
+- **Structured output:** Agent responses use validated schemas.
+- **Rules in code, judgment in the model:** The model evaluates lead fit, while application code applies the contact threshold.
+- **Evidence-based scoring:** Scores reflect researched facts rather than unsupported assumptions about company needs, budgets, or hiring intentions.
+- **Resumable workflow:** The pipeline can continue from a company's current status.
+- **Security:** The dashboard uses a server-side proxy for authenticated backend requests. API keys stay on the server, never in browser-accessible code.
+- **Reliability:** Retry handling, per-company run locks, structured logs, and health checks.
 
 ## Project Structure
 
-The main components are organized around the backend and dashboard.
-
 ```text
 clientpilot/
+├── .github/workflows/   # CI pipeline
+├── app/                 # Next.js dashboard
 ├── backend/
 │   ├── app/
-│   │   ├── agents/
-│   │   ├── main.py
-│   │   ├── pipeline.py
-│   │   └── schemas.py
+│   │   ├── agents/      # Research, scoring, drafting agents
+│   │   ├── main.py      # FastAPI entry point
+│   │   ├── pipeline.py  # LangGraph pipeline
+│   │   └── schemas.py   # Validated output schemas
 │   ├── evals/
 │   │   ├── cases.json
 │   │   ├── run_eval.py
 │   │   └── RESULTS.md
 │   └── requirements.txt
-├── app/
+├── n8n/                 # Workflow definitions
 ├── public/
 ├── package.json
 └── README.md
 ```
 
-This is a high-level overview; the exact files may vary as the project evolves. No screenshot is embedded yet. Add one after capturing a real screenshot and saving it in the repository.
-
 ## Run Locally
 
 ### Prerequisites
 
-* Python
-* Node.js and npm
-* Access to the required external services
-* API credentials for the services you configure
+- Python 3.10+
+- Node.js and npm
+- Accounts and API credentials for the services you configure (Gemini, Supabase, n8n)
 
-### 1. Set Up the Backend
+### 1. Clone the Repository
 
-Open PowerShell and run these commands one by one:
+```bash
+git clone https://github.com/MahamHayatDev/clientpilot.git
+cd clientpilot
+```
 
-```powershell
-cd C:\Users\Maham\clientpilot\backend
+### 2. Set Up the Backend
+
+```bash
+cd backend
 
 python -m venv venv
+
+# Windows (PowerShell)
 .\venv\Scripts\Activate.ps1
+# macOS / Linux
+# source venv/bin/activate
 
 pip install -r requirements.txt
 
+# Windows (PowerShell)
 Copy-Item .env.example .env
+# macOS / Linux
+# cp .env.example .env
 ```
 
-Configure your environment variables in `backend\.env`. Use the variable names expected by `.env.example` and the application. Set a secure backend API key.
+Fill in your environment variables in `backend/.env`, using the variable names from `.env.example`. Set a secure backend API key.
 
 Start the backend:
 
-```powershell
+```bash
 uvicorn app.main:app --reload
 ```
 
-### 2. Set Up the Dashboard
+### 3. Set Up the Dashboard
 
-Open a second PowerShell window.
+In a second terminal, from the project root:
 
-```powershell
-cd C:\Users\Maham\clientpilot
-
+```bash
 npm install
 ```
 
-Create `.env.local` in the project root and configure the variables required by the dashboard:
+Create `.env.local` in the project root with:
 
-* `BACKEND_URL`
-* `BACKEND_API_KEY`
-* `DASHBOARD_USER`
-* `DASHBOARD_PASSWORD`
+- `BACKEND_URL`
+- `BACKEND_API_KEY` (must match the backend's API key)
+- `DASHBOARD_USER`
+- `DASHBOARD_PASSWORD`
 
-The dashboard's backend API key must match the backend's configured API key. Use a strong dashboard password and keep all secrets out of version control.
+Use a strong dashboard password and keep all secrets out of version control.
 
 Start the dashboard:
 
-```powershell
+```bash
 npm run dev
 ```
 
@@ -206,47 +226,46 @@ Open `http://localhost:3000` in your browser.
 
 ## Tests and Evaluation
 
-Run backend tests:
+Run the backend tests:
 
-```powershell
-cd C:\Users\Maham\clientpilot\backend
-
+```bash
+cd backend
 python -m pytest -q
 ```
 
 Run the evaluation suite:
 
-```powershell
+```bash
 python -m evals.run_eval
 ```
 
-Evaluation calls may consume API quota and can be affected by provider rate limits. Review the generated report before updating the published evaluation metrics.
+Evaluation calls consume API quota and can be affected by provider rate limits. Review the generated report before updating the published metrics.
 
 ## Security Notes
 
-* Never commit `.env`, `.env.local`, API keys, service-role keys, passwords, or other credentials.
-* Keep backend credentials server-side.
-* Use strong credentials for dashboard access.
-* Review generated outreach before sending it.
-* Treat company website content as untrusted input.
+- Never commit `.env`, `.env.local`, API keys, service-role keys, passwords, or other credentials.
+- Keep backend credentials server-side.
+- Use strong credentials for dashboard access.
+- Review generated outreach before sending it.
+- Treat company website content as untrusted input.
 
 ## Known Limitations
 
-* Model results can vary between runs.
-* The initial evaluation set is small and includes subjective borderline labels.
-* Gemini API availability and rate limits can affect evaluation runs.
-* n8n schedules depend on the configured n8n instance being available.
-* The run lock is held in memory and is intended for a single application instance.
-* Outreach is delivered for manual sending; automated reply tracking is not implemented.
-* The project is not yet publicly hosted.
+- Model results can vary between runs.
+- The evaluation set is small and includes subjective borderline labels.
+- Gemini API availability and rate limits can affect evaluation runs.
+- n8n schedules depend on the configured n8n instance being available.
+- The run lock is held in memory and is intended for a single application instance.
+- Outreach is delivered for manual sending; automated reply tracking is not implemented.
+- The project is not yet publicly hosted.
 
 ## Future Improvements
 
-* Expand evaluation coverage with more real-world company examples.
-* Improve borderline lead decisions and measure false-positive rates.
-* Add more monitoring for model failures and pipeline execution.
-* Record a walkthrough demonstrating research, scoring, and human approval.
+- Expand evaluation coverage with more real-world company examples.
+- Improve borderline lead decisions and measure false-positive rates.
+- Add more monitoring for model failures and pipeline execution.
+- Add a public live demo.
 
 ## Author
 
-Built as a practical AI automation project combining lead research, structured scoring, workflow orchestration, and human-reviewed outreach.
+Built by [Maham Shaukat](https://github.com/MahamHayatDev) as a practical AI automation project combining lead research, structured scoring, workflow orchestration, and human-reviewed outreach.
